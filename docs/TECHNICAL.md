@@ -76,6 +76,15 @@ CIA는 seed 암호화되어 있습니다. [pyctr](https://github.com/ihaveamac/p
 - ctxb 텍스처는 3DS PICA 형식(ETC1, ETC1A4, RGBA4 등)입니다. `tools/ctxb.py`가 읽고, `tools/etc1.py`가 etcpak으로 블록을 압축한 뒤 3DS 배치(8×8 타일, 블록 바이트 순서 반전)로 씁니다.
 - 텍스처 크기와 형식을 바꾸지 않고 GAR 안에서 그 자리만 덮어씁니다.
 
+## HOME 메뉴 배너·아이콘 (ExeFS)
+
+CIA를 다시 만들 때만 적용됩니다. LayeredFS로는 바뀌지 않습니다.
+
+- `banner`(CBMD): `0x08` 공통 CGFX 오프셋, `0x0C`부터 지역별 CGFX 오프셋 16개(유럽 8, 일본, 미국 4, 중국, 한국, 대만), `0x84` CWAV 오프셋. CGFX는 각각 LZ11로 압축되어 있습니다.
+- 영문 로고 `EverOasis_logo_JP_2`(512×128)는 모든 지역이 같습니다. 가타카나 제목과 부제 `EverOasis_logo_JP`(256×64, RGBA4)는 **일본 칸과 한국 칸에만** 있으며, 한국판 본체의 HOME 메뉴는 한국 칸을 읽습니다. 두 칸을 모두 바꿉니다(`tools/build_banner.py`).
+- CGFX를 다시 압축하면 크기가 달라지므로 지역별 오프셋과 CWAV 오프셋(0x20 정렬)을 다시 씁니다.
+- `icon`(SMDH): 언어 칸 12개에 짧은 제목 `에버 오아시스`, 긴 제목 `에버 오아시스⏎정령과 씨앗족의 신기루`를 씁니다. 게시자 `Nintendo`는 그대로 둡니다.
+
 ## 게임 스크립트 (화자 추출, 개발용)
 
 `data/scripts/*.gar` 속 `.gsb`는 Squirrel 3 바이트코드(`FAFA RIQS`, 정수 4바이트)입니다. `tools/cnut.py`가 읽고,

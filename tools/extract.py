@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""일본판 CIA 에서 빌드에 필요한 romfs 파일을 뽑는다 → extract/jp/romfs/data/Region_JP/...
+"""일본판 CIA 에서 빌드에 필요한 romfs 파일과 HOME 메뉴 배너·아이콘을 뽑는다.
+  → extract/jp/romfs/data/Region_JP/..., extract/jp/exefs/banner.bin, icon.bin
 
   python tools/extract.py "일본판.cia"
   python tools/extract.py "일본판.cia" --all        # romfs 전체
@@ -12,6 +13,7 @@ import sys, os
 TID = 0x0004000000164A00
 NEED = 'data/Region_JP'   # 폰트·텍스트·그림 글씨가 전부 여기 있다
 OUT = 'extract/jp/romfs'
+EXEFS = 'extract/jp/exefs'
 
 sysdata = os.path.join(os.environ.get('APPDATA', ''), 'Azahar', 'sysdata')
 for var, name in (('BOOT9_PATH', 'boot9.bin'), ('SEEDDB_PATH', 'seeddb.bin')):
@@ -44,7 +46,11 @@ def main():
             with romfs.open(p) as f, open(dst, 'wb') as o:
                 o.write(f.read())
             n += 1
-    print('%d개 파일 → %s' % (n, OUT))
+        os.makedirs(EXEFS, exist_ok=True)
+        for name in ('banner', 'icon'):
+            with ncch.exefs.open(name) as f, open(os.path.join(EXEFS, name + '.bin'), 'wb') as o:
+                o.write(f.read())
+    print('%d개 파일 → %s, 배너·아이콘 → %s' % (n, OUT, EXEFS))
 
 
 if __name__ == '__main__':

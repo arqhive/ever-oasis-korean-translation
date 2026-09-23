@@ -9,6 +9,7 @@
 - 본문 폰트의 한자·가나 칸을 비워 한글 1,774자를 넣었습니다(Gothic A1 Bold 기반, 원본과 같은 테두리).
 - 지역·던전 이름 17종, 레벨 업·랭크·클리어 등 팝 글씨, 타이틀 로고까지 그림 글씨 26종을 한글화했습니다.
 - 주인공의 성별에 따라 형/오빠, 누나/언니처럼 호칭이 바뀌도록 했습니다.
+- HOME 메뉴 배너와 게임 이름도 한글화했습니다. 이 부분은 CIA를 직접 다시 만들 때만 적용됩니다.
 - 배포본은 romfs 파일 23개를 덮어씌우는 LayeredFS 패치입니다.
 
 > 이 저장소에는 **게임 데이터(롬·디스크 이미지, 추출한 원문 대사, 그래픽, 스크린샷)가 들어 있지 않습니다.**
@@ -59,7 +60,7 @@ LayeredFS 패치라 롬 전체가 아니라 바뀌는 파일을 비교합니다.
 
 ### 알려진 문제
 
-- HOME 메뉴의 게임 제목과 배너는 일본어로 나옵니다. LayeredFS로는 바꿀 수 없습니다.
+- LayeredFS로는 HOME 메뉴의 제목과 배너가 바뀌지 않습니다. 3DS가 설치된 타이틀의 메타데이터에서 읽기 때문이며, 한글판 CIA를 직접 만들면 바뀝니다.
 - 주인공 이름 입력에서 한글을 쓸 수 있는지는 확인하지 않았습니다.
 
 ## 개발자용: 직접 빌드
@@ -77,9 +78,11 @@ python tools/extract.py "일본판.cia"    # extract/jp/romfs 에 원본 추출
 python tools/text_io.py extract         # work/text/messages.json 생성 (번역은 translation/ko.json 에서 채움)
 python tools/build_all.py               # 폰트·텍스트·그림 글씨 빌드 → release/luma, Azahar 모드 폴더
 python tools/make_release.py v0.1       # release/EverOasis_KO_v0.1.zip
+python tools/build_banner.py            # HOME 메뉴 배너·아이콘 → work/exefs/banner.bin, icon.bin (CIA 재빌드용)
 ```
 
 같은 원본과 폰트로 빌드하면 배포본과 바이트 단위로 같은 파일이 나옵니다.
+`build_banner.py`의 결과는 CIA를 다시 만들 때 ExeFS의 같은 이름 파일과 바꿔 넣습니다. 한국판 본체의 HOME 메뉴는 배너의 한국 칸을 읽으므로 일본·한국 칸을 모두 바꾸고, 제목은 12개 언어 칸 모두 한국어로 씁니다.
 
 ### 번역 수정
 
@@ -99,7 +102,7 @@ docs/          기술 문서, 문체 규칙, QA 체크리스트, 릴리즈 노�
 
 ### 기술 문서
 
-GMSG·GZFX·GAR·ctxb 형식과 패치 방식은 [`docs/TECHNICAL.md`](docs/TECHNICAL.md)에 정리했습니다.
+GMSG·GZFX·GAR·ctxb·배너(CBMD) 형식과 패치 방식은 [`docs/TECHNICAL.md`](docs/TECHNICAL.md)에 정리했습니다.
 
 ## 변경 내역
 
