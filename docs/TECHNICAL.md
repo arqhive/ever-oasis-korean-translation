@@ -85,7 +85,7 @@ CIA를 다시 만들 때만 적용됩니다. LayeredFS로는 바뀌지 않습니
 - CGFX를 다시 압축하면 크기가 달라지므로 지역별 오프셋과 CWAV 오프셋(0x20 정렬)을 다시 씁니다.
 - `icon`(SMDH): 언어 칸 12개에 짧은 제목 `에버 오아시스`, 긴 제목 `에버 오아시스⏎정령과 씨앗족의 신기루`를 씁니다. 게시자 `Nintendo`는 그대로 둡니다.
 
-## 게임 스크립트 (화자 추출, 개발용)
+## 게임 스크립트 (화자 정보)
 
-`data/scripts/*.gar` 속 `.gsb`는 Squirrel 3 바이트코드(`FAFA RIQS`, 정수 4바이트)입니다. `tools/cnut.py`가 읽고,
-`tools/speakers.py`가 `msg_sync_talk_event(대사 ID, 핸들)` 호출에서 대화 상대를 뽑습니다. 결과는 `translation/speakers/`에 있으며 번역 검수용이고 빌드에는 쓰지 않습니다.
+`data/scripts/*.gar` 속 `.gsb`는 Squirrel 3 바이트코드(`FAFA RIQS`, 정수 4바이트)입니다. `msg_sync_talk_event(대사 ID, 핸들)` 호출에서 대화 상대를 뽑아
+`translation/speakers/`에 저장해 두었습니다. 번역 검수용이며 빌드에는 쓰지 않습니다(`tools/export_json.py`가 대사 목록을 내보낼 때 씁니다).
