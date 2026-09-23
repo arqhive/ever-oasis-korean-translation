@@ -39,6 +39,16 @@
 `locale.txt`(내용 `JPN JP`)는 빼지 않습니다. 한국판·북미판처럼 일본판이 아닌 본체에서도 게임을 일본 지역으로 실행하게 합니다.
 예전에 다른 패치를 넣은 적이 있다면 `sd:/luma/titles/0004000000164A00/` 폴더를 지우고 새로 복사합니다.
 
+HOME 메뉴의 제목과 배너까지 한글로 바꾸려면 본인이 가진 일본판 CIA로 한글판 CIA를 직접 만듭니다.
+
+```bash
+python tools/build_banner.py
+python tools/build_cia.py --cia "일본판.cia" --out "한글판.cia"
+```
+
+이 CIA는 배너와 아이콘만 바꾸고 romfs는 원본 그대로 둡니다. 게임 안 한글은 위의 LayeredFS 패치로 입힙니다.
+`3dstool`, `makerom`(`tools/bin`에 두거나 `--tools`로 지정)과 복호화용 `boot9.bin`, `seeddb.bin`이 필요합니다.
+
 자세한 방법은 [`README_한국어.txt`](release/README_한국어.txt)를 참고하세요.
 
 ### 파일 확인값
@@ -69,6 +79,7 @@ LayeredFS 패치라 롬 전체가 아니라 바뀌는 파일을 비교합니다.
 
 - Python 3.10 이상과 [`requirements.txt`](requirements.txt)의 패키지(pyctr, Pillow, NumPy, etcpak).
 - 일본판 CIA와 복호화용 `boot9.bin`, `seeddb.bin`. Azahar를 쓰면 `%APPDATA%\Azahar\sysdata\`에 있는 파일을 자동으로 씁니다.
+- CIA 재빌드에는 `3dstool`, `makerom`이 추가로 필요합니다.
 - 폰트: [Gothic A1](https://fonts.google.com/specimen/Gothic+A1) Bold → `tools/fonts/GothicA1-Bold.ttf`, [Jua](https://fonts.google.com/specimen/Jua) → `tools/fonts/Jua.ttf`, [나눔스퀘어라운드](https://hangeul.naver.com/font) ExtraBold → `tools/fonts/nsr/NanumSquareRoundEB.ttf`, Noto Serif KR → `C:\Windows\Fonts\NotoSerifKR-VF.ttf`.
 
 ### 빌드
@@ -78,11 +89,12 @@ python tools/extract.py "일본판.cia"    # extract/jp/romfs 에 원본 추출
 python tools/text_io.py extract         # work/text/messages.json 생성 (번역은 translation/ko.json 에서 채움)
 python tools/build_all.py               # 폰트·텍스트·그림 글씨 빌드 → release/luma, Azahar 모드 폴더
 python tools/make_release.py v0.1       # release/EverOasis_KO_v0.1.zip
-python tools/build_banner.py            # HOME 메뉴 배너·아이콘 → work/exefs/banner.bin, icon.bin (CIA 재빌드용)
+python tools/build_banner.py            # HOME 메뉴 배너·아이콘 → work/exefs/banner.bin, icon.bin
+python tools/build_cia.py --cia "일본판.cia" --out "한글판.cia"   # 배너·아이콘만 바꾼 CIA
 ```
 
 같은 원본과 폰트로 빌드하면 배포본과 바이트 단위로 같은 파일이 나옵니다.
-`build_banner.py`의 결과는 CIA를 다시 만들 때 ExeFS의 같은 이름 파일과 바꿔 넣습니다. 한국판 본체의 HOME 메뉴는 배너의 한국 칸을 읽으므로 일본·한국 칸을 모두 바꾸고, 제목은 12개 언어 칸 모두 한국어로 씁니다.
+`build_cia.py`는 pyctr로 콘텐츠를 복호화(seed 포함)한 뒤 ExeFS의 배너·아이콘만 바꾸고, 3dstool로 CXI를 다시 싸서 makerom으로 CIA를 묶습니다. 한국판 본체의 HOME 메뉴는 배너의 한국 칸을 읽으므로 일본·한국 칸을 모두 바꾸고, 제목은 12개 언어 칸 모두 한국어로 씁니다.
 
 ### 번역 수정
 

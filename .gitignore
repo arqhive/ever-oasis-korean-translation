@@ -18,3 +18,4 @@ tools/fonts/
 
 __pycache__/
 *.pyc
+tools/bin/
