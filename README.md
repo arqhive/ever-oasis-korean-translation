@@ -80,6 +80,7 @@
 
 ```bash
 python tools/extract.py "일본판.cia"    # extract/jp 에 원본 romfs·배너·아이콘 추출
+python tools/extract.py "일본판.cia" --cxi   # Azahar 테스트용 CXI (한글은 build_all 이 채우는 모드 폴더로 덮임)
 python tools/text_io.py extract         # work/text/messages.json 생성 (번역은 translation/ko.json 에서 채움)
 python tools/build_all.py               # 폰트·텍스트·그림 글씨 빌드 → release/luma, Azahar 모드 폴더
 python tools/build_banner.py            # HOME 메뉴 배너 제목 그림 → work/exefs

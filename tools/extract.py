@@ -4,6 +4,8 @@
 
   python tools/extract.py "일본판.cia"
   python tools/extract.py "일본판.cia" --all        # romfs 전체
+  python tools/extract.py "일본판.cia" --cxi        # Azahar 테스트용 복호화 CXI → emu/EverOasis_JP.cxi
+                                                     (한글은 build_all.py 가 채우는 Azahar 모드 폴더로 덮인다)
 
 pyctr 가 복호화에 쓸 boot9.bin 과 seeddb.bin(이 게임은 seed 암호화)이 필요하다.
 Azahar 를 쓰면 %APPDATA%\\Azahar\\sysdata\\ 에 있으므로 자동으로 그 경로를 쓴다.
@@ -32,8 +34,19 @@ def walk(romfs, path):
         yield path
 
 
+def make_cxi(cia, dst='emu/EverOasis_JP.cxi'):
+    import shutil
+    from pyctr.type.ncch import NCCHSection
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    with CIAReader(cia) as c, c.contents[0].open_raw_section(NCCHSection.FullDecrypted) as f, open(dst, 'wb') as o:
+        shutil.copyfileobj(f, o, 1 << 24)
+    print('CXI → %s (%s 바이트)' % (dst, format(os.path.getsize(dst), ',')))
+
+
 def main():
     cia = sys.argv[1]; top = '/' if '--all' in sys.argv else '/' + NEED
+    if '--cxi' in sys.argv:
+        return make_cxi(cia)
     n = 0
     with CIAReader(cia) as c:
         ncch = c.contents[0]
