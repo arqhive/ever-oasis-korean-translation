@@ -309,7 +309,7 @@ def _patch(src, dst, payload, bindir, work, key_extra):
             d = W(os.path.join('rx', rel))
             if not os.path.exists(d): raise SystemExit('원본에 없는 파일: ' + rel)
             shutil.copyfile(os.path.join(root, f), d); n += 1
-    log('게임 안 한글 파일 %d개 교체' % n)
+    log('게임 내 한글 파일 %d개 교체' % n)
     T.run('3dstool', ['-cvtf', 'romfs', 'romfs.bin', '--romfs-dir', 'rx'], 'cromfs')
     shutil.rmtree(W('rx'))
     log('다시 묶는 중...')

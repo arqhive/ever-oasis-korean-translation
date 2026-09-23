@@ -5,7 +5,7 @@
   python tools/build_cia.py --cia "일본판.cia" --out "한글판.cia"
   python tools/build_cia.py --cia "일본판.3ds" --out "한글판.3ds"
 
-게임 안 한글(romfs 23개)과 HOME 메뉴 배너·게임 이름이 모두 들어간다. 결과 형식은 --out 확장자로 정한다.
+게임 내 한글(romfs 23개)과 HOME 메뉴 배너·게임 이름이 모두 들어간다. 결과 형식은 --out 확장자로 정한다.
 3dstool·makerom 은 tools/bin, 키(boot9.bin·seeddb.bin)는 Azahar sysdata 등에서 찾는다(eopatch.key_dirs).
 """
 import argparse, os, sys
