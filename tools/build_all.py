@@ -26,9 +26,6 @@ def main():
         for f in FILES:
             dst = os.path.join(base, f); os.makedirs(os.path.dirname(dst), exist_ok=True)
             shutil.copyfile(os.path.join('work', 'romfs', f), dst)
-    # 한국판·북미판 본체에서도 일본판으로 돌도록 Luma 지역 고정
-    with open(os.path.join(os.path.dirname(luma), 'locale.txt'), 'w', newline='') as f:
-        f.write('JPN JP')
     done = sum(1 for r in rows if r['ko'])
     print('빌드 완료: 번역 %d / %d개, 파일 %d개 → Azahar 모드, %s' % (done, len(rows), len(FILES), luma))
 

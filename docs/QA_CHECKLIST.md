@@ -8,7 +8,6 @@
 - **Azahar**: 모드 폴더에 이미 반영되어 있다. `emu/EverOasis_JP.cxi` 로 실행하면 된다.
 - **실기(Luma)**: `release/luma` 폴더를 SD 카드 루트에 덮어쓴다 → `sd:/luma/titles/0004000000164A00/`.
   - Luma 설정에서 `Enable game patching` 이 켜져 있어야 한다.
-  - 한국판 본체이므로 같은 폴더의 `locale.txt`(`JPN JP`)로 지역을 일본으로 맞춘다.
   - **같은 폴더에 예전 패치 파일이 남아 있지 않은지 먼저 확인**(페데레이션 포스 때 헛테스트 원인).
 
 ## 1. 기술 확인 (먼저 봐야 할 것)

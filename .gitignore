@@ -19,3 +19,8 @@ tools/fonts/
 __pycache__/
 *.pyc
 tools/bin/
+release/python/
+release/patcher/lib/
+release/patcher/bin/
+release/patcher/payload/
+release/patcher/__pycache__/

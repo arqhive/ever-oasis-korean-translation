@@ -105,6 +105,7 @@ def main():
     nb, before, after = patch_banner(b)
     open(os.path.join(DST, 'banner.bin'), 'wb').write(nb)
     before.save(os.path.join(DST, 'logo_before.png')); after.save(os.path.join(DST, 'logo_after.png'))
+    open(os.path.join(DST, 'logo_rgba4.bin'), 'wb').write(etc1.encode_rgba4(draw_logo(256, 64)))
     ic = patch_smdh(open(os.path.join(SRC, 'icon.bin'), 'rb').read())
     open(os.path.join(DST, 'icon.bin'), 'wb').write(ic)
     # 다시 읽어 검증
