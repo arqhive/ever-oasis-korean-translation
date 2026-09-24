@@ -3,7 +3,7 @@
 *Ever Oasis* (닌텐도 3DS, 일본판 `CTR-P-BAGJ` / `0004000000164A00`) 비공식 한국어 팬 패치입니다.
 대사는 일본어판 원문을 기준으로 번역했습니다.
 
-**제작: arqhive** · **최신 버전: [v0.2](../../releases/tag/v0.2)**
+**제작: arqhive** · **최신 버전: [v0.3](../../releases/tag/v0.3)**
 
 - 게임 내 문구 8,503개를 모두 번역했습니다(대사, 의뢰, 메뉴, 아이템·특기 설명, 도움말, 할 일·동료 기록, 크레디트).
 - 본문 폰트의 한자·가나 칸을 비워 한글 1,774자를 넣었습니다(Gothic A1 Bold 기반, 원본과 같은 테두리).
@@ -29,7 +29,7 @@
 
 | | 방법 A. LayeredFS | 방법 B. 패처로 한글판 CIA·3DS 만들기 |
 |---|---|---|
-| 받는 파일 | `EverOasis_KO_v0.2_LayeredFS.zip` | `EverOasis_KO_v0.2_Patcher.zip` |
+| 받는 파일 | `EverOasis_KO_v0.3_LayeredFS.zip` | `EverOasis_KO_v0.3_Patcher.zip` |
 | 게임 내 한글 | 적용 | 적용 |
 | HOME 메뉴 게임 이름·배너 | 일본어 그대로 | 한글 |
 | 필요한 것 | 이미 설치된 일본판, Luma3DS 게임 패치 설정 | 일본판 파일 하나(3DS 실기 설치용이면 `.cia`, 에뮬레이터·플래시카트용이면 `.3ds`), 윈도우 PC, 암호화된 원본이면 `boot9.bin`·`seeddb.bin` |
@@ -86,8 +86,8 @@ python tools/text_io.py extract         # work/text/messages.json 생성 (번역
 python tools/build_all.py               # 폰트·텍스트·그림 글씨 빌드 → release/luma, Azahar 모드 폴더
 python tools/build_banner.py            # HOME 메뉴 배너 제목 그림 → work/exefs
 python tools/build_cia.py --cia "일본판.cia" --out "한글판.cia"   # 전부 들어간 CIA (.3ds 도 가능)
-python tools/make_patcher.py v0.2 --python <임베디드 파이썬 zip 또는 폴더>   # release/patcher·python 채우기
-python tools/make_release.py v0.2       # release/EverOasis_KO_v0.2_LayeredFS.zip, _Patcher.zip
+python tools/make_patcher.py v0.3 --python <임베디드 파이썬 zip 또는 폴더>   # release/patcher·python 채우기
+python tools/make_release.py v0.3       # release/EverOasis_KO_v0.3_LayeredFS.zip, _Patcher.zip
 ```
 
 같은 원본과 폰트로 빌드하면 배포본과 바이트 단위로 같은 파일이 나옵니다.
