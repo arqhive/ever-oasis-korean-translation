@@ -13,7 +13,7 @@ import sys, os, struct
 sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-import lz11, banner, etc1
+import lz11, banner, etc1, gptimg
 
 SRC = 'extract/jp/exefs'
 DST = 'work/exefs'
@@ -45,7 +45,14 @@ def put(img, mask, color, x, y):
     img.alpha_composite(layer, (x, y))
 
 
-def draw_logo(w, h):
+def draw_logo(w, h, orig=None):
+    g = gptimg.load('HOME 배너/banner_JPN_JP EverOasis_logo_JP.png') or gptimg.load('banner.png')
+    if g is not None and orig is not None:        # GPT 가 그려 준 제목 그림
+        return gptimg.place(g, orig)
+    return _draw_logo(w, h)
+
+
+def _draw_logo(w, h):
     """원본 배치: 제목은 왼쪽 정렬 2~29행, 부제는 35~62행(후리가나 포함) 가로 전체."""
     img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
     t = text_mask(TITLE, 900, 27, 210)
@@ -66,8 +73,9 @@ def patch_banner(b):
             t = next(t for t in banner.textures(cgfx) if t[0] == TEX)
             name, w, h, fmt, data, size = t
             assert (w, h, fmt) == (256, 64, 4), t
-            if before is None: before = banner.decode(cgfx, t)
-            logo = draw_logo(w, h); enc = etc1.encode_rgba4(logo); assert len(enc) == size
+            cur = banner.decode(cgfx, t)
+            if before is None: before = cur
+            logo = draw_logo(w, h, cur); enc = etc1.encode_rgba4(logo); assert len(enc) == size
             cgfx[data:data + size] = enc
             after = banner.decode(cgfx, t)
             comp = lz11.compress(bytes(cgfx)); assert lz11.decompress(comp) == bytes(cgfx)
@@ -105,7 +113,7 @@ def main():
     nb, before, after = patch_banner(b)
     open(os.path.join(DST, 'banner.bin'), 'wb').write(nb)
     before.save(os.path.join(DST, 'logo_before.png')); after.save(os.path.join(DST, 'logo_after.png'))
-    open(os.path.join(DST, 'logo_rgba4.bin'), 'wb').write(etc1.encode_rgba4(draw_logo(256, 64)))
+    open(os.path.join(DST, 'logo_rgba4.bin'), 'wb').write(etc1.encode_rgba4(after))
     ic = patch_smdh(open(os.path.join(SRC, 'icon.bin'), 'rb').read())
     open(os.path.join(DST, 'icon.bin'), 'wb').write(ic)
     # 다시 읽어 검증

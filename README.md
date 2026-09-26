@@ -3,14 +3,14 @@
 *Ever Oasis* (닌텐도 3DS, 일본판 `CTR-P-BAGJ` / `0004000000164A00`) 비공식 한국어 팬 패치입니다.
 대사는 일본어판 원문을 기준으로 번역했습니다.
 
-**제작: arqhive** · **최신 버전: [v0.3](../../releases/tag/v0.3)**
+**제작: arqhive** · **최신 버전: [v0.4](../../releases/tag/v0.4)**
 
 - 게임 내 문구 8,503개를 모두 번역했습니다(대사, 의뢰, 메뉴, 아이템·특기 설명, 도움말, 할 일·동료 기록, 크레디트).
 - 본문 폰트의 한자·가나 칸을 비워 한글 1,774자를 넣었습니다(Gothic A1 Bold 기반, 원본과 같은 테두리).
-- 지역·던전 이름 17종, 레벨 업·랭크·클리어 등 팝 글씨, 타이틀 로고까지 그림 글씨 26종을 한글화했습니다.
+- 지역·던전 이름 17종, 레벨 업·랭크·클리어 등 팝 글씨, 타이틀 로고까지 그림 글씨 79장을 한글로 새로 그렸습니다.
 - 주인공의 성별에 따라 형/오빠, 누나/언니처럼 호칭이 바뀌도록 했습니다.
 - HOME 메뉴 배너와 게임 이름도 한글화했습니다. 이 부분은 패처로 만든 한글판 CIA를 설치할 때 적용됩니다.
-- 배포본은 romfs 파일 23개를 덮어씌우는 LayeredFS 패치와, 일본판 CIA 또는 3DS 파일을 한글판으로 바꾸는 패처 두 가지입니다. 둘 중 하나만 쓰면 됩니다.
+- 배포본은 romfs 파일 57개를 덮어씌우는 LayeredFS 패치와, 일본판 CIA 또는 3DS 파일을 한글판으로 바꾸는 패처 두 가지입니다. 둘 중 하나만 쓰면 됩니다.
 
 > 이 저장소에는 **게임 데이터(롬·디스크 이미지, 추출한 원문 대사, 그래픽, 스크린샷)가 들어 있지 않습니다.**
 > 패치를 만들거나 적용하려면 본인이 소유한 게임에서 직접 덤프한 원본이 필요합니다.
@@ -29,7 +29,7 @@
 
 | | 방법 A. LayeredFS | 방법 B. 패처로 한글판 CIA·3DS 만들기 |
 |---|---|---|
-| 받는 파일 | `EverOasis_KO_v0.3_LayeredFS.zip` | `EverOasis_KO_v0.3_Patcher.zip` |
+| 받는 파일 | `EverOasis_KO_v0.4_LayeredFS.zip` | `EverOasis_KO_v0.4_Patcher.zip` |
 | 게임 내 한글 | 적용 | 적용 |
 | HOME 메뉴 게임 이름·배너 | 일본어 그대로 | 한글 |
 | 필요한 것 | 이미 설치된 일본판, Luma3DS 게임 패치 설정 | 일본판 파일 하나(3DS 실기 설치용이면 `.cia`, 에뮬레이터·플래시카트용이면 `.3ds`), 윈도우 PC, 암호화된 원본이면 `boot9.bin`·`seeddb.bin` |
@@ -86,8 +86,8 @@ python tools/text_io.py extract         # work/text/messages.json 생성 (번역
 python tools/build_all.py               # 폰트·텍스트·그림 글씨 빌드 → release/luma, Azahar 모드 폴더
 python tools/build_banner.py            # HOME 메뉴 배너 제목 그림 → work/exefs
 python tools/build_cia.py --cia "일본판.cia" --out "한글판.cia"   # 전부 들어간 CIA (.3ds 도 가능)
-python tools/make_patcher.py v0.3 --python <임베디드 파이썬 zip 또는 폴더>   # release/patcher·python 채우기
-python tools/make_release.py v0.3       # release/EverOasis_KO_v0.3_LayeredFS.zip, _Patcher.zip
+python tools/make_patcher.py v0.4 --python <임베디드 파이썬 zip 또는 폴더>   # release/patcher·python 채우기
+python tools/make_release.py v0.4       # release/EverOasis_KO_v0.4_LayeredFS.zip, _Patcher.zip
 ```
 
 같은 원본과 폰트로 빌드하면 배포본과 바이트 단위로 같은 파일이 나옵니다.
@@ -121,7 +121,7 @@ GMSG·GZFX·GAR·ctxb·배너(CBMD) 형식과 패치 방식은 [`docs/TECHNICAL.
 
 - 이 저장소의 도구 코드, 한국어 번역문, 문서: [MIT License](LICENSE) (© 2026 arqhive).
 - 본문 한글 글리프는 [Gothic A1](https://fonts.google.com/specimen/Gothic+A1)(SIL Open Font License 1.1)로 그렸습니다.
-- 그림 글씨는 [나눔스퀘어라운드](https://hangeul.naver.com/font)(SIL Open Font License 1.1), [Jua](https://fonts.google.com/specimen/Jua)(SIL Open Font License 1.1), [Noto Serif KR](https://fonts.google.com/noto/specimen/Noto+Serif+KR)(SIL Open Font License 1.1)로 그렸습니다.
+- 그림 글씨(지역·던전 이름, 팝 글씨, 타이틀, 배너)는 원본 디자인을 따라 새로 그렸습니다. 폰트로 그리는 예전 방식은 `tools/` 안에 남아 있으며 [나눔스퀘어라운드](https://hangeul.naver.com/font), [Jua](https://fonts.google.com/specimen/Jua), [Noto Serif KR](https://fonts.google.com/noto/specimen/Noto+Serif+KR)(모두 SIL Open Font License 1.1)를 씁니다.
 
 ## 면책
 

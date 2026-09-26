@@ -3,7 +3,7 @@
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
 from PIL import Image
-import ctxb, etc1, pop_render as P
+import ctxb, etc1, gptimg, pop_render as P
 from build_title_logo import chunks
 
 SRC = 'extract/jp/romfs/data/Region_JP/Japanese'
@@ -18,9 +18,16 @@ POP = {
 }
 GUARD = ('ui_field', 0x31300, '가드')
 
-def render_target(d, key, text, letters=None, white=False):
+def render_target(d, key, text, letters=None, white=False, gar=None):
     off, ln, w, h, pf, dt = chunks(d)[key]
     orig = ctxb.decode(bytes(d[off:off + ln]), w, h, pf, dt)
+    g = gptimg.load('%s_%x.png' % (gar, key)) if gar else None
+    if g is not None:                       # GPT 가 그려 준 글자를 원본 자리에 넣는다
+        img = gptimg.place(g, orig)
+        enc = etc1.encode_rgba4(img) if (pf, dt) == (0x6752, 0x8033) else etc1.encode(img, alpha=(pf == 0x675b))
+        assert len(enc) == ln, (key, len(enc), ln)
+        d[off:off + ln] = enc
+        return orig, img
     if white:
         me = P.measure(orig, white=True)
         img = P.render(text, NSR, me, shear=0.12, fill_h=0.95, rings=P.RINGS_WHITE,
@@ -38,8 +45,8 @@ def main(preview=None):
     os.makedirs(DST, exist_ok=True); shots = []
     for gar, items in POP.items():
         d = bytearray(open('%s/%s.gar' % (SRC, gar), 'rb').read())
-        for key, text, n in items: shots.append(render_target(d, key, text, letters=n))
-        if gar == GUARD[0]: shots.append(render_target(d, GUARD[1], GUARD[2], white=True))
+        for key, text, n in items: shots.append(render_target(d, key, text, letters=n, gar=gar))
+        if gar == GUARD[0]: shots.append(render_target(d, GUARD[1], GUARD[2], white=True, gar=gar))
         open('%s/%s.gar' % (DST, gar), 'wb').write(bytes(d)); print(gar, '갱신')
     return shots
 

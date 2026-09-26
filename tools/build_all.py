@@ -11,7 +11,8 @@ import build_font, text_io, build_titles, build_title_logo, build_pop
 TID = '0004000000164A00'
 FILES = ['data/Region_JP/main.gzf', 'data/Region_JP/Japanese/main.gmsg'] + \
         ['data/Region_JP/Japanese/font_dg%02d.gar' % i for i in range(17)] + \
-        ['data/Region_JP/Japanese/%s.gar' % g for g in ('ui_title', 'ui_town', 'ui_field', 'ui_keep')]
+        ['data/Region_JP/Japanese/%s.gar' % g for g in ('ui_title', 'ui_town', 'ui_field', 'ui_keep')] + \
+        ['data/async/font_dangname_%02d%s.gar' % (i, x) for i in range(17) for x in ('', 'ext')]
 
 def main():
     dev = '--dev' in sys.argv

@@ -4,7 +4,7 @@ import sys, os, struct
 sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-import ctxb, etc1
+import ctxb, etc1, gptimg
 
 SRC = 'extract/jp/romfs/data/Region_JP/Japanese/ui_title.gar'
 DST = 'work/romfs/data/Region_JP/Japanese/ui_title.gar'
@@ -44,17 +44,25 @@ def main():
     d = bytearray(open(SRC, 'rb').read()); ch = chunks(d)
     # 1) 글자판 0x6bb00: 전부 지우고 다시 쓴다
     off, ln, w, h, pf, dt = ch[0x6bb00]
-    img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-    draw_text(img, KANA, BLUE, (100, 72, 212, 86), weight=600)
-    draw_text(img, SUB, GREEN, (92, 134, 324, 152), weight=700)
+    g = gptimg.load('타이틀/ui_title_6bb00.png')
+    if g is not None:
+        img = gptimg.place(g, ctxb.decode(bytes(d[off:off + ln]), w, h, pf, dt))
+    else:
+        img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+        draw_text(img, KANA, BLUE, (100, 72, 212, 86), weight=600)
+        draw_text(img, SUB, GREEN, (92, 134, 324, 152), weight=700)
     enc = etc1.encode(img, alpha=True); assert len(enc) == ln; d[off:off + ln] = enc
     # 2) 로고 합성본 0x8bb80: 가타카나 칸과 부제 띠만 지우고 다시 쓴다
     off, ln, w, h, pf, dt = ch[0x8bb80]
     img = ctxb.decode(bytes(d[off:off + ln]), w, h, pf, dt)
-    a = np.array(img); a[13:28, 76:173] = 0; a[75:, :] = 0
-    img = Image.fromarray(a, 'RGBA')
-    draw_text(img, KANA, BLUE, (78, 14, 172, 26), weight=600)
-    draw_text(img, SUB, GREEN, (60, 82, 300, 100), weight=700)
+    g = gptimg.load('타이틀/ui_title_8bb80.png')
+    if g is not None:                      # GPT 가 영문 로고까지 포함해 그려 준 합성본
+        img = gptimg.place(g, img)      # 원본 로고가 있던 자리·크기에 맞춘다
+    else:
+        a = np.array(img); a[13:28, 76:173] = 0; a[75:, :] = 0
+        img = Image.fromarray(a, 'RGBA')
+        draw_text(img, KANA, BLUE, (78, 14, 172, 26), weight=600)
+        draw_text(img, SUB, GREEN, (60, 82, 300, 100), weight=700)
     enc = etc1.encode(img, alpha=True); assert len(enc) == ln; d[off:off + ln] = enc
     os.makedirs(os.path.dirname(DST), exist_ok=True)
     open(DST, 'wb').write(bytes(d)); print('ui_title.gar 갱신')
