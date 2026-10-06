@@ -29,7 +29,7 @@
 
 | | 방법 A. LayeredFS | 방법 B. 패처로 한글판 CIA·3DS 만들기 |
 |---|---|---|
-| 받는 파일 | `EverOasis_KO_v0.4_LayeredFS.zip` | `EverOasis_KO_v0.4_Patcher.zip` |
+| 받는 파일 | `BAGJ_KPatch_v0.4_LayeredFS.zip` | `BAGJ_KPatch_v0.4_CIA.zip` |
 | 게임 내 한글 | 적용 | 적용 |
 | HOME 메뉴 게임 이름·배너 | 일본어 그대로 | 한글 |
 | 필요한 것 | 이미 설치된 일본판, Luma3DS 게임 패치 설정 | 일본판 파일 하나(3DS 실기 설치용이면 `.cia`, 에뮬레이터·플래시카트용이면 `.3ds`), 윈도우 PC, 암호화된 원본이면 `boot9.bin`·`seeddb.bin` |
