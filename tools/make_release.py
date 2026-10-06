@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-"""배포 ZIP 두 개 만들기.
+"""배포 ZIP 두 개 만들기. 이름 규칙은 <게임 코드>_KPatch_<버전>_<꼬리>.
 
   python tools/build_all.py && python tools/build_banner.py
   python tools/make_patcher.py v0.2 [--python <임베디드 파이썬>]      # release/patcher·release/python 채우기
   python tools/make_release.py v0.2
 
-release/EverOasis_KO_<버전>_LayeredFS.zip
+release/BAGJ_KPatch_<버전>_LayeredFS.zip
   luma/titles/0004000000164A00/romfs/...   SD 카드 루트에 푸는 LayeredFS 패치
   README_한국어.txt, LICENSE.txt
-release/EverOasis_KO_<버전>_Patcher.zip
-  EverOasis_KO_<버전>_Patcher/패치하기.bat, patcher/, python/   일본판 CIA·3DS 를 한글판으로 만드는 패처
+release/BAGJ_KPatch_<버전>_CIA.zip
+  BAGJ_KPatch_<버전>_CIA/패치하기.bat, patcher/, python/   일본판 CIA·3DS 를 한글판으로 만드는 패처
   README_한국어.txt, LICENSE.txt
 """
 import sys, os, zipfile
@@ -36,14 +36,14 @@ def main():
         sys.exit('패처가 준비되지 않았습니다. 먼저 python tools/make_patcher.py %s 를 실행하세요.' % ver)
     docs = [(os.path.join('release', 'README_한국어.txt'), 'README_한국어.txt'), ('LICENSE', 'LICENSE.txt')]
 
-    a = os.path.join('release', 'EverOasis_KO_%s_LayeredFS.zip' % ver)
+    a = os.path.join('release', 'BAGJ_KPatch_%s_LayeredFS.zip' % ver)
     with zipfile.ZipFile(a, 'w', zipfile.ZIP_DEFLATED) as z:
         n = add_tree(z, LUMA, 'luma')
         for p, name in docs: z.write(p, name)
     print('%s: LayeredFS 파일 %d개 (%s 바이트)' % (a, n, format(os.path.getsize(a), ',')))
 
-    b = os.path.join('release', 'EverOasis_KO_%s_Patcher.zip' % ver)
-    top = 'EverOasis_KO_%s_Patcher' % ver
+    b = os.path.join('release', 'BAGJ_KPatch_%s_CIA.zip' % ver)
+    top = 'BAGJ_KPatch_%s_CIA' % ver
     with zipfile.ZipFile(b, 'w', zipfile.ZIP_DEFLATED) as z:
         z.write(os.path.join('release', '패치하기.bat'), top + '/패치하기.bat')
         n = add_tree(z, os.path.join('release', 'patcher'), top + '/patcher')

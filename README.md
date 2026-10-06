@@ -87,7 +87,7 @@ python tools/build_all.py               # 폰트·텍스트·그림 글씨 빌�
 python tools/build_banner.py            # HOME 메뉴 배너 제목 그림 → work/exefs
 python tools/build_cia.py --cia "일본판.cia" --out "한글판.cia"   # 전부 들어간 CIA (.3ds 도 가능)
 python tools/make_patcher.py v0.4 --python <임베디드 파이썬 zip 또는 폴더>   # release/patcher·python 채우기
-python tools/make_release.py v0.4       # release/EverOasis_KO_v0.4_LayeredFS.zip, _Patcher.zip
+python tools/make_release.py v0.4       # release/BAGJ_KPatch_v0.4_LayeredFS.zip, _CIA.zip
 ```
 
 같은 원본과 폰트로 빌드하면 배포본과 바이트 단위로 같은 파일이 나옵니다.
