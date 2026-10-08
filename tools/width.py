@@ -24,3 +24,44 @@ def width(t,hangul_adv=16):
     return max(mx,w)
 def lines(t):
     return [l for l in TAG.sub('',t).replace('{z}','').split('\n')]
+
+# ── 대사창 한도 ───────────────────────────────────────────────
+# 원본 일본어 15,416줄을 전수 측정해 얻은 값(성별 분기는 긴 쪽만 센다).
+#   입력 대기({03} 직전, 다음 줄 화살표가 뜬다) 332px
+#   메시지 끝({00} 직전)                        326px
+#   중간 줄({01}·{02} 직전)                     333px
+# 332px 를 넘으면 화살표 UI 가 마지막 글자를 덮는다(ID 90024 제보, 360px).
+LIMITS = {'03': 332, '00': 326, '01': 333, '02': 333, '--': 333}
+LIMIT = 332          # 종류를 가리지 않는 안전선
+_ANY = re.compile(r'\{([0-9a-z]{2})(?::[0-9a-f]{8})?\}')
+_BRANCH = re.compile(r'\{15\}([^{]*)\{z\}\{16\}([^{]*)\{z\}')
+
+
+def one_branch(t):
+    """성별 분기 {15}A{z}{16}B{z} 는 한 번에 한쪽만 보이므로 긴 쪽만 남긴다."""
+    return _BRANCH.sub(lambda m: m.group(1) if width(m.group(1)) >= width(m.group(2))
+                       else m.group(2), t)
+
+
+def seglines(t):
+    """(줄 텍스트, 줄을 끝낸 코드) 목록. 코드는 LIMITS 의 열쇠."""
+    t = one_branch(t); out = []; cur = ''; i = 0
+    while i < len(t):
+        m = _ANY.match(t, i)
+        if m:
+            c = m.group(1)
+            if c in ('01', '02', '03', '00'): out.append((cur, c)); cur = ''
+            i = m.end(); continue
+        if t[i] not in '﻿�': cur += t[i]
+        i += 1
+    if cur.strip(): out.append((cur, '--'))
+    return out
+
+
+def over(t):
+    """한도를 넘은 줄 [(폭, 한도, 코드, 줄)]."""
+    bad = []
+    for line, c in seglines(t):
+        w = width(line); lim = LIMITS.get(c, 333)
+        if w > lim: bad.append((w, lim, c, line))
+    return bad

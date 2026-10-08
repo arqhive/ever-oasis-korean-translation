@@ -9,6 +9,7 @@ payload 에는 한글 romfs 파일, 배너 제목 그림(logo_rgba4.bin), 게임
 lib 에는 eopatch·lz11 과 pyctr·pycryptodomex(설치된 것 복사), bin 에는 3dstool·makerom 을 넣는다.
 """
 import sys, os, json, shutil, hashlib, zipfile
+sys.stdout.reconfigure(encoding='utf-8')
 sys.path.insert(0, os.path.dirname(__file__))
 import build_banner
 
@@ -51,7 +52,11 @@ def main():
         shutil.copyfile(os.path.join('tools', 'bin', f), os.path.join(b, f))
     if py:
         dst = os.path.join('release', 'python')
-        if os.path.exists(dst): shutil.rmtree(dst)
+        # --python 에 대상 폴더 자신을 넘기면 rmtree 가 원본을 지운다(2026-10-08 당함)
+        if os.path.abspath(py) == os.path.abspath(dst):
+            print('release/python 은 이미 제자리에 있으니 그대로 씁니다'); py = None
+        elif os.path.exists(dst): shutil.rmtree(dst)
+    if py:
         if os.path.isdir(py): shutil.copytree(py, dst)
         else:
             with zipfile.ZipFile(py) as z:

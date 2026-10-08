@@ -10,10 +10,13 @@
 import sys, os, json, re, collections, importlib.util
 sys.path.insert(0, os.path.dirname(__file__))
 from text_io import strip_ruby, codes, plain, RUBY, OUT
+import width as width_mod
 from width import width
 
-LIMIT = 400   # 대사창 한도(원문 최대 399px)
-WARN = 360    # 원문 99.9%가 331px 이하
+# 한도는 원본 일본어 전수 측정값(width.LIMITS). 성별 분기를 양쪽 다 세어 399px 로
+# 부풀렸던 옛 한도(400/360)는 실제보다 느슨했다 — 332px 를 넘으면 화살표가 글자를 덮는다.
+LIMIT = width_mod.LIMIT      # 332
+WARN = LIMIT
 NAME = {'0d': '[주인공]', '0e': '[이름]', '0f': '[가게]', '10': '[아이템]', '11': '[숫자]',
         '12': '[값]', '13': '[대상]', '08': '[버튼]'}
 TAG = re.compile(r'\{([0-9a-f]{2})(?::([0-9a-f]{8}))?\}')
@@ -27,7 +30,10 @@ def show(t):
 
 
 def maxw(t):
-    return max([width(l) for l in plain(strip_ruby(t)).split('\n')] + [0])
+    """줄 종류별 한도를 넘긴 줄의 폭(없으면 가장 넓은 줄)."""
+    bad = width_mod.over(t)
+    if bad: return max(w for w, lim, c, l in bad)
+    return max([width(l) for l in width_mod.lines(strip_ruby(t))] + [0])
 
 
 def load_batch(n):

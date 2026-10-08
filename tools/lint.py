@@ -24,8 +24,13 @@ KO_END = re.compile(r'(니다|세요|요|죠|까|다|해|줘|자|지|야|어|아
 JP_SENT = re.compile(r'[ぁ-ん]$|[。！？…]$')
 
 
+# 치환 자리는 화면에서 이름·숫자로 채워진다. 비워 두면 「…{0d}.」가 「….」로 보여
+# 말줄임표 뒤 부호로 잘못 잡힌다.
+SLOT = re.compile(r'\{(0[d-f]|1[0-4]|08)(?::[0-9a-f]{8})?\}')
+
+
 def body(t):
-    return plain(strip_ruby(t))
+    return plain(SLOT.sub('○', strip_ruby(t)))
 
 
 def page_lasts(t):
@@ -39,6 +44,7 @@ def page_lasts(t):
 
 
 def main():
+    sys.stdout.reconfigure(encoding='utf8')
     detail = '--detail' in sys.argv
     rows = [r for r in json.load(open(OUT, encoding='utf8')) if r['ko']]
     term = json.load(open('translation/terms.json', encoding='utf8'))
