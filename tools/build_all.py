@@ -6,12 +6,14 @@
 """
 import sys, os, json, shutil
 sys.path.insert(0, os.path.dirname(__file__))
-import build_font, text_io, build_titles, build_title_logo, build_pop
+import build_font, text_io, build_titles, build_title_logo, build_pop, build_effect
 
 TID = '0004000000164A00'
 FILES = ['data/Region_JP/main.gzf', 'data/Region_JP/Japanese/main.gmsg'] + \
         ['data/Region_JP/Japanese/font_dg%02d.gar' % i for i in range(17)] + \
         ['data/Region_JP/Japanese/%s.gar' % g for g in ('ui_title', 'ui_town', 'ui_field', 'ui_keep')] + \
+        ['data/Region_JP/Japanese/%s.gar' % g          # 연출 글씨(3D 모델 안의 텍스처)
+         for g in ('eff_town', 'eff_demo01', 'eff_demo02')] + \
         ['data/async/font_dangname_%02d%s.gar' % (i, x) for i in range(17) for x in ('', 'ext')]
 
 def main():
@@ -20,7 +22,7 @@ def main():
     ko = ''.join(r['ko'] for r in rows if r['ko'])
     build_font.build('dev' if dev else 'release', extra_text=ko)
     text_io.apply_(); text_io.check(); text_io.save()
-    build_titles.main(); build_title_logo.main(); build_pop.main()
+    build_titles.main(); build_title_logo.main(); build_pop.main(); build_effect.main()
     mods = os.path.join(os.environ['APPDATA'], 'Azahar', 'load', 'mods', TID, 'romfs')
     luma = os.path.join('release', 'luma', 'titles', TID, 'romfs')
     for base in (mods, luma):
