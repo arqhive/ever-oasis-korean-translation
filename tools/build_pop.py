@@ -33,6 +33,45 @@ IBB_X = {('ui_town', 'dl_level_up_town_u.ibb'): [(0x24a4, 62, 67)],
          ('ui_town', 'dl_level_up_hanamise_u.ibb'): [(0x3208, 62, 67)],
          ('ui_town', 'dl_level_up_u.ibb'): [(0x35f8, 62, 67)]}
 
+# 글자 칸의 글자 가로 배율(u16, 0x2000 = 1.0) 고치기: 글자 칸 기록(종류 4, 부모, 이름 번호) + 0x1C.
+# 꽃상점 정보 화면(cm_town_edit_d)의 상품 이름 칸 t_goods_01~03 은 폭 120 이라 한글 아이템 이름 32개가
+# 넘쳤다(최장 「새끼 날다람쥐올빼미」 149px, 10/10 제보). 이름을 줄이면 뜻이 빠져서 글자를 0.8 배로 좁힌다.
+IBB_U16 = {}
+
+# 아이템 이름을 띄우는 글자 칸(기록 오프셋). 원본은 칸 폭에 맞춘 일본어 이름이라 한글 아이템 이름(최장 149px)이
+# 넘친다(10/10 상점·재고·납품 창 제보). 칸마다 가장 긴 이름이 들어갈 만큼만 글자 가로 배율을 줄인다
+# (배율 = (칸 폭 - 2) / ITEM_MAX, 원래 배율보다 커지지는 않음). 찾는 법: work/ibb_text.py.
+ITEM_MAX = 149
+ITEM_NAME_PANES = {
+    ('ui_field', 'hud_field_u.ibb'): [0x2a0],                                     # 아이템 획득 알림
+    ('ui_town', 'hud_town_u.ibb'): [0x2a0],
+    ('ui_keep', 'cm_doing_list_d.ibb'): [0x3484],                                 # 할 일·의뢰 보상
+    ('ui_keep', 'cm_onegai_d.ibb'): [0x1260],
+    ('ui_keep', 'cm_status_d.ibb'): [0x15c0, 0x1b38, 0x2058],                     # 장비(무기·장신구)
+    ('ui_keep', 'cm_status_u.ibb'): [0xa74],
+    ('ui_town', 'equipment_d.ibb'): [0x984, 0xefc, 0x141c, 0x28dc, 0x45f0],
+    ('ui_keep', 'cm_town_edit_d.ibb'): [0x1138, 0x1558, 0x1978],                  # 꽃상점 정보 상품
+    ('ui_town', 'result_3_d.ibb'): [0x10e0, 0x1500, 0x1920],
+    ('ui_town', 'hanashop_kaimono_d.ibb'): [0x154c],                              # 꽃상점 판매·재고
+    ('ui_town', 'hanashop_nouhin_d.ibb'): [0x904, 0xd54, 0x11a4],                 # 납품 소재
+    ('ui_town', 'hanashop_nouhin_u.ibb'): [0x8f8, 0x1104, 0x1910],
+    ('ui_town', 'tw_autonohin_d.ibb'): [0x650, 0xbc8, 0x1448],                    # 자동 납품
+    ('ui_town', 'tw_autonohin_u.ibb'): [0x19c8, 0x2168, 0x2908],
+    ('ui_town', 'cultivationplace_choice_d.ibb'): [0x1b30],                       # 재배(씨앗)
+    ('ui_town', 'tw_cultivationplace_1_d.ibb'): [0xe74, 0x13dc],
+}
+
+# 칸 폭이 아니라 화면에서 쓸 수 있는 폭(아이콘·숫자 앞까지)을 Azahar 막대 시험(10/10, work/UI칸_측정.json)으로 잰 칸.
+# (기록 오프셋, 쓸 수 있는 폭 px, 들어갈 가장 긴 번역 px) → 글자 가로 배율 = min(원래, 쓸 수 있는 폭 / 가장 긴 번역).
+FIT_PANES = {
+    ('ui_keep', 'memu_item_list_u_2.ibb'): [(0xc2c, 130, 149)],                    # 아이템 목록(개수 표시 앞 132)
+    ('ui_keep', 'cm_party_d.ibb'): [(0xf28, 130, 152), (0x10c8, 130, 152), (0x1268, 130, 152)],   # 파티 상세 특기
+    ('ui_keep', 'char_menu_kaiwa_d.ibb'): [(0x159c, 112, 117)],                     # 프로필 가게 이름판
+    ('ui_town', 'cultivationplace_choice_d.ibb'): [(0xb30, 112, 117)],
+    ('ui_keep', 'cm_party.ibb'): [(0x4b4, 108, 154), (0x1e3c, 108, 154), (0x37c4, 108, 154)],    # 파티 카드 효과(원래 0.75)
+    ('ui_keep', 'cm_status_d.ibb'): [(0x99c, 146, 154)],                            # 캐릭터 상태 효과
+}
+
 
 def gar_files(d):
     import struct
@@ -54,6 +93,30 @@ def patch_ibb(d, gar):
         for off, x0, x1 in edits:
             assert struct.unpack_from('<h', d, o + off)[0] == x0, (name, hex(off))
             struct.pack_into('<h', d, o + off, x1)
+    for (g, name), edits in IBB_U16.items():
+        if g != gar: continue
+        fs = fs or gar_files(d)
+        o = fs[name][0]
+        for off, v0, v1 in edits:
+            assert struct.unpack_from('<H', d, o + off)[0] == v0, (name, hex(off))
+            struct.pack_into('<H', d, o + off, v1)
+    for (g, name), panes in ITEM_NAME_PANES.items():
+        if g != gar: continue
+        fs = fs or gar_files(d)
+        o = fs[name][0]
+        for p in panes:
+            assert struct.unpack_from('<H', d, o + p)[0] == 4, (name, hex(p))     # 글자 칸 기록
+            w = struct.unpack_from('<H', d, o + p - 0x0C)[0]
+            fx = struct.unpack_from('<H', d, o + p + 0x1C)[0]
+            struct.pack_into('<H', d, o + p + 0x1C, min(fx, round(0x2000 * (w - 2) / ITEM_MAX)))
+    for (g, name), panes in FIT_PANES.items():
+        if g != gar: continue
+        fs = fs or gar_files(d)
+        o = fs[name][0]
+        for p, avail, longest in panes:
+            assert struct.unpack_from('<H', d, o + p)[0] == 4, (name, hex(p))
+            fx = struct.unpack_from('<H', d, o + p + 0x1C)[0]
+            struct.pack_into('<H', d, o + p + 0x1C, min(fx, round(0x2000 * avail / longest)))
 
 
 def split_move(img, n_left, left_max, right_min):

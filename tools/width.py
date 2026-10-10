@@ -14,11 +14,17 @@ def adv_table():
     if _adv is None:
         _adv={c:a for c,a,x,col,row in gzf.load('extract/jp/romfs/data/Region_JP/main.gzf')[1]}
     return _adv
+# 버튼 아이콘 {08:xx} 은 화면에서 약 20px(실기 사진 실측, 83015 「✚✚ 버튼으로 바꾸고 Ⓐ 버튼을 누르면」 10/10).
+# 예전엔 0 으로 쳐서 아이콘 든 줄이 창에 닿아도 검사를 통과했다. 줄 안에서는 ICON_CH 한 글자로 바꿔 센다.
+ICON_W = 20
+ICON_CH = ''
+ICON = re.compile(r'\{08:[0-9a-f]{8}\}')
 def width(t,hangul_adv=16):
     a=adv_table(); w=0; mx=0
-    for ch in TAG.sub('',t).replace('{z}',''):
+    for ch in TAG.sub('',ICON.sub(ICON_CH,t)).replace('{z}',''):
         if ch=='\n': mx=max(mx,w); w=0; continue
         if ch in '�￿': continue
+        if ch==ICON_CH: w+=ICON_W; continue
         c=ord(ch)
         w+= hangul_adv if 0xAC00<=c<=0xD7A3 else a.get(c,14)
     return max(mx,w)
@@ -51,6 +57,7 @@ def seglines(t):
         if m:
             c = m.group(1)
             if c in ('01', '02', '03', '00'): out.append((cur, c)); cur = ''
+            elif c == '08': cur += ICON_CH
             i = m.end(); continue
         if t[i] not in '﻿�': cur += t[i]
         i += 1
