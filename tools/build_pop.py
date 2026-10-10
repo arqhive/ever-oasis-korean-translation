@@ -73,6 +73,9 @@ FIT_PANES = {
     # 꽃상점 상품 카드 이름 띠(원래 글자 0.8). 상품은 5000~5101, 최장 「나뭇가지 바람개비」 133px 가
     # 띠 양 끝에 닿았다(10/10 제보, 띠 안쪽 약 106px). 0.77 로도 띠에 닿아 보여서(10/10 2차 제보) 92px 에 맞춘다.
     ('ui_town', 'hanashop_menu_d.ibb'): [(0x7dc, 92, 133), (0xff4, 92, 133), (0x18bc, 92, 133)],
+    # 합성 레시피 설명 칸 t_flavor_00(폭 160×3줄, 기록 종류 0x104). 장비·회복약 설명(최장 6919 「모든 상태 변화가
+    # 낫는다.」 180px)이 칸을 넘었다(10/11 Azahar 제보). 일반 아이템 설명 칸(210)은 그대로 두고 여기만 좁힌다.
+    ('ui_keep', 'mixed_d.ibb'): [(0x1910, 158, 180)],
 }
 
 
@@ -117,7 +120,7 @@ def patch_ibb(d, gar):
         fs = fs or gar_files(d)
         o = fs[name][0]
         for p, avail, longest in panes:
-            assert struct.unpack_from('<H', d, o + p)[0] == 4, (name, hex(p))
+            assert struct.unpack_from('<H', d, o + p)[0] & 0xff == 4, (name, hex(p))     # 글자 칸(0x104 = 여러 줄 칸)
             fx = struct.unpack_from('<H', d, o + p + 0x1C)[0]
             struct.pack_into('<H', d, o + p + 0x1C, min(fx, round(0x2000 * avail / longest)))
 
