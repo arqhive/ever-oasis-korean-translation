@@ -25,13 +25,27 @@ FIT = {}
 # 레벨 업 화면 3종(dl_level_up_town_u·_hanamise_u·_u .ibb)은 level_up_eff_01(256×64)을 u=114/256 에서 잘라
 # 왼쪽(0~114)·오른쪽(114~256, 폭 138 로 눌러 담음) 판에 붙이고, 두 판이 화면에서 약 8px 겹친다.
 # 그래서 106~114px 띠가 사라져 「벨」 가운데가 날아갔다(10/9). → 앞 n 개 덩어리는 left_max 이하, 나머지는 right_min 이상.
-SPLIT = {}   # 10/9 시험: 판 위치를 고쳐 겹침을 없애면 필요 없음. 안 되면 {('ui_town', 0x26800): (2, 105, 117)} 로 되돌림
+# 랭크 업 화면(dl_level_up_hanamise_u)은 왼쪽 판에 rank_up_eff_00(「랭크」)을, 오른쪽 판에 level_up_eff_01 의
+# u≥114 부분(원본 「アップ！」)을 쓴다. 「벨」이 114 경계에 걸쳐 있어 랭크 업 가운데에 벨 오른쪽 조각이 끼었다(10/12 제보).
+# → 원본처럼 「레벨」은 113 이하, 「업!」은 120 이상으로 옮긴다(벨-업 사이 간격은 그대로 약 6px).
+SPLIT = {}   # 10/12 재작업4: GPT 가 「레벨」 x≤110, 「업!」 x≥120 으로 그려 와서 옮길 필요 없음. 예전 값 {('ui_town', 0x26800): (2, 110, 120)}
+# 랭크 업 왼쪽 판(rank_up_eff_00, u 0~114)의 「랭크」(잉크 7~102)를 경계 쪽으로 붙인다(오른쪽 끝 113).
+# 「업!」이 120 부터 시작하므로 「랭크」~「업」 간격이 레벨 업의 「벨」~「업」과 같아진다(10/12 사용자 요청).
+SHIFT_X = {}   # 재작업4 그림은 「랭크」 오른쪽 끝이 이미 113. 예전 값 {('ui_town', 0x2b900): 11}
+# 「업!」(u≥115)이 「벨」·「크」보다 5px 낮아 처져 보였다 → 5px 올린다(업 위 끝 9→4, 「벨」 4·「크」 3 과 맞춤, 10/12 사용자 요청).
+SHIFT_RIGHT_Y = {}   # 재작업4 그림은 세로 9~49 안. 예전 값 {('ui_town', 0x26800): (115, -5)}
+# 재작업5(평평, 세로 7~48)를 넣어 보니 파란 칸을 거의 꽉 채워 위가 금테에 닿았다(10/12) → 85% 로 줄인다.
+# 텍스처를 x=114 에서 나눠, 왼쪽(「레벨」·「랭크」)은 오른쪽 끝, 오른쪽(「업!」)은 왼쪽 끝과 세로 가운데를 고정한다.
+SHRINK = {('ui_town', 0x26800): 0.85, ('ui_town', 0x2b900): 0.85}
 
 # 레이아웃 판 위치 고치기: (gar, ibb 이름) → [(ibb 안 판 기록 오프셋, 원래 x, 새 x)]
 # 오른쪽 판(배율 0.9, 폭 138)이 왼쪽 판과 약 5px 겹쳐 텍스처 106~114px 띠가 가려진다 → 오른쪽 판을 5px 오른쪽으로.
-IBB_X = {('ui_town', 'dl_level_up_town_u.ibb'): [(0x24a4, 62, 67)],
-         ('ui_town', 'dl_level_up_hanamise_u.ibb'): [(0x3208, 62, 67)],
-         ('ui_town', 'dl_level_up_u.ibb'): [(0x35f8, 62, 67)]}
+# 10/12: SPLIT 로 「레벨」이 텍스처에서 10, 「업!」이 9 텍셀 왼쪽으로 갔으니(배율 0.9 → 화면 9·8px)
+# 레벨 업 화면 두 개는 왼쪽 판(-56)·오른쪽 판을 9px 오른쪽으로 옮겨 화면 위치를 지킨다. 랭크 업은 「업!」만 8px 당겨짐.
+IBB_X = {('ui_town', 'dl_level_up_town_u.ibb'): [(0x24a4, 62, 76), (0x2554, -56, -47)],
+         # 랭크 업도 레벨 업과 같은 자리로(왼쪽 −47, 오른쪽 76): 단어 전체가 파란 칸 가운데로 9px 오른쪽(10/12 사용자 요청)
+         ('ui_town', 'dl_level_up_hanamise_u.ibb'): [(0x3208, 62, 76), (0x32b8, -56, -47)],
+         ('ui_town', 'dl_level_up_u.ibb'): [(0x35f8, 62, 76), (0x36a8, -56, -47)]}
 
 # 글자 칸의 글자 가로 배율(u16, 0x2000 = 1.0) 고치기: 글자 칸 기록(종류 4, 부모, 이름 번호) + 0x1C.
 # 꽃상점 정보 화면(cm_town_edit_d)의 상품 이름 칸 t_goods_01~03 은 폭 120 이라 한글 아이템 이름 32개가
@@ -148,6 +162,20 @@ def split_move(img, n_left, left_max, right_min):
     return Image.fromarray(out, 'RGBA')
 
 
+def shrink_halves(img, sc, seam=114):
+    """x=seam 에서 나눈 두 쪽을 각각 sc 배로 줄인다. 왼쪽은 잉크 오른쪽 끝, 오른쪽은 왼쪽 끝을 고정(세로는 가운데)."""
+    from PIL import Image
+    W, H = img.size; out = Image.new('RGBA', img.size)
+    for x0, x1, right in ((0, min(seam, W), True), (seam, W, False)):
+        if x0 >= W: continue
+        part = img.crop((x0, 0, x1, H)); b = part.getbbox()
+        if not b: continue
+        g = part.crop(b); g = g.resize((round(g.width * sc), round(g.height * sc)), Image.LANCZOS)
+        x = x0 + (b[2] - g.width if right else b[0])
+        out.alpha_composite(g, (x, round((b[1] + b[3] - g.height) / 2)))
+    return gptimg.quantize(out)
+
+
 def fit(img, y0, y1):
     from PIL import Image
     b = img.getbbox()
@@ -167,7 +195,16 @@ def render_target(d, key, text, letters=None, white=False, gar=None):
         # place() 를 태우면 원본 글자 영역에 다시 맞추느라 가로로 늘어난다.
         img = gptimg.quantize(g) if g.size == orig.size else gptimg.place(g, orig)
         if (gar, key) in FIT: img = gptimg.quantize(fit(img, *FIT[(gar, key)]))
+        if (gar, key) in SHRINK: img = shrink_halves(img, SHRINK[(gar, key)])
         if (gar, key) in SPLIT: img = split_move(img, *SPLIT[(gar, key)])
+        if (gar, key) in SHIFT_X:
+            from PIL import Image
+            moved = Image.new('RGBA', img.size); moved.paste(img, (SHIFT_X[(gar, key)], 0)); img = moved
+        if (gar, key) in SHIFT_RIGHT_Y:
+            from PIL import Image
+            x0, dy = SHIFT_RIGHT_Y[(gar, key)]
+            right = img.crop((x0, 0, img.width, img.height)); img = img.copy()
+            img.paste(Image.new('RGBA', right.size), (x0, 0)); img.paste(right, (x0, dy))
         enc = etc1.encode_rgba4(img) if (pf, dt) == (0x6752, 0x8033) else etc1.encode(img, alpha=(pf == 0x675b))
         assert len(enc) == ln, (key, len(enc), ln)
         d[off:off + ln] = enc
